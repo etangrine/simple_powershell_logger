@@ -1,0 +1,6 @@
+- name: Deploy py_logger
+  hosts: all
+  gather_facts: false
+
+  roles: 
+  - deploy_py_logger

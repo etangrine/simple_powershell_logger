@@ -1,0 +1,3 @@
+---
+# defaults file for roles/deploy_py_logger
+logger_install_path : 'C:\scripts\read_powershell_history.py'
