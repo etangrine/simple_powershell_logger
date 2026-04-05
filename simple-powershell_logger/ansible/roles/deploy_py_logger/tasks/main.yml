@@ -2,8 +2,8 @@
 # tasks file for roles/deploy_py_logger
 - name: Install Python 3.12
   ansible.windows.win_package:
-    path: https://python.org
-    product_id: 'Python 3.12.0 (64-bit)'
+    path: https://www.python.org/ftp/python/3.12.3/python-3.12.3-amd64.exe
+    product_id: '{3c310467-33a7-47b3-858e-096773289047}'
     arguments: /quiet InstallAllUsers=1 PrependPath=1
     state: present
 - name: Install Python libraries 
@@ -11,7 +11,7 @@
 
 - name: Copy logger file
   ansible.windows.win_copy:
-    src: C:\Users\ericd\simple_powershell_logger\simple-powershell_logger\src\simple_powershell_logger\read_powershell_history.py
+    src: ../../../src/simple_powershell_logger/read_powershell_history.py
     dest: "{{logger_install_path}}"
 
 - name: Execute Logger in background
