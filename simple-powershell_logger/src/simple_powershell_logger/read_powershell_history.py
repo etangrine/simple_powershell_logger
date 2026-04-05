@@ -29,7 +29,7 @@ class FileChecking(FileSystemEventHandler):
         # self.static_dir = os.path.normpath(r"C:\Users\ericd\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine")
         self.static_dir = dir
         self.content = ""
-        with open (self.static_path,"r") as ps_con_history:
+        with open(self.static_path,"r", encoding="utf-8",errors="replace") as ps_con_history:
             self.content = ps_con_history.readlines()
         
     def on_modified(self, event: FileSystemEvent):
@@ -38,15 +38,20 @@ class FileChecking(FileSystemEventHandler):
             return
         norm_path = os.path.normpath(event.src_path)
         if norm_path == self.static_path:
-            with open(self.static_path,"r") as ps_con_history:
-                current_content = ps_con_history.readlines()
-                diff = list((Counter(current_content)-Counter(self.content)).elements())
-                self.content = current_content
-                command = str(diff)[2:-4].strip()
-                json = {"command":command,"hostname":hostname}
-                endpoint = "log"
-                post_log(endpoint, json)
-                print(str(diff)[2:-4].strip())
+            time.sleep(0.1)
+            try:
+                with open(self.static_path,"r", encoding="utf-8",errors="replace") as ps_con_history:
+                    current_content = ps_con_history.readlines()
+                    diff = list((Counter(current_content)-Counter(self.content)).elements())
+                    self.content = current_content
+                    if command:
+                        command = str(diff)[2:-4].strip()
+                        json = {"command":command,"hostname":hostname}
+                        endpoint = "log"
+                        post_log(endpoint, json)
+                        print(str(diff)[2:-4].strip())
+            except PermissionError:
+                print("skipping as file is likley locked")
 def post_log(endpoint, payload):
     try:
         r = requests.post(f"{URL}/{endpoint}", json=payload, timeout=5)
