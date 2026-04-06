@@ -1,0 +1,6 @@
+- name: Deploy log_server
+  hosts: all
+  gather_facts: false
+
+  roles: 
+  - log_server

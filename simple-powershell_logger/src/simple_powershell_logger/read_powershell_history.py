@@ -55,11 +55,7 @@ class FileChecking(FileSystemEventHandler):
 def post_log(endpoint, payload):
     try:
         r = requests.post(f"{URL}/{endpoint}", json=payload, timeout=5)
-        # webhook = DiscordWebhook(url="https://discord.com/api/webhooks/1489748337912582288/eHSWcC8UNwlBHCFY5ujSkE48TDOpPiEr2LjFd3_sKJd_A9D8t_cRwD8gbxfqJJ1VVLHQ",
-        #                          content=f"Command: {payload["command"]}, Hostname: {payload["hostname"]}",
-        #                          rate_limit_retry=True
-        #                          )
-        # response = webhook.execute()
+        
         # print(response)
 
         # r = requests.post(f"{URL}", json=payload, timeout=5)

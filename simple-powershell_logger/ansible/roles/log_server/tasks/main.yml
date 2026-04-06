@@ -1,0 +1,45 @@
+# ---
+# tasks file for roles/log_server
+# tasks file for c2_server role
+- name: Update apt cache and install system packages
+  apt:
+    name:
+      - python3-pip
+      - python3-venv
+      - python3-full
+      - pipx
+      - flask
+      - discord-webhook
+      # - nginx
+      # - gunicorn
+    state: present
+    update_cache: yes
+    # become: yes
+
+- name: Create project directory
+  file:
+    path: "{{ project_dir }}"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: '0755'
+
+- name: Copy C2 server source code
+  copy:
+    src: ../src/  # Assumes playbook is run from ansible/ dir
+    dest: "{{ project_dir }}/src/simple_powershell_logger"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+
+- name: Start the flask server
+  command:
+    cmd: "flask --app {{ project_dir }}/src/simple_powershell_logger/log_server run --host=100.95.68.26 --port 5000"
+  become: no
+# # Place this AFTER 'Copy C2 server source code'
+# - name: Configure Django settings with dynamic IP
+#   template:
+#     src: settings.py.j2
+#     dest: "{{ project_dir }}/src/c2project/settings.py"
+#     owner: "{{ user }}"
+#     group: "{{ user }}"
+#   notify: Restart C2 Service
