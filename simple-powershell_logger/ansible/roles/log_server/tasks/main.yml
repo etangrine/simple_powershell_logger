@@ -8,13 +8,13 @@
       - python3-venv
       - python3-full
       - pipx
-      - flask
-      - discord-webhook
+      # - flask
+      # - discord-webhook
       # - nginx
       # - gunicorn
     state: present
     update_cache: yes
-    # become: yes
+  become: yes
 
 - name: Create project directory
   file:
@@ -23,6 +23,7 @@
     owner: "{{ user }}"
     group: "{{ user }}"
     mode: '0755'
+  become: yes
 
 - name: Copy C2 server source code
   copy:
@@ -30,11 +31,54 @@
     dest: "{{ project_dir }}/src/simple_powershell_logger"
     owner: "{{ user }}"
     group: "{{ user }}"
-
-- name: Start the flask server
+- name: Copy Poetry config files
+  copy:
+    src: ../{{ item }}
+    dest: "{{ project_dir }}/{{ item }}"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+  loop:
+    - pyproject.toml
+    - poetry.lock
+    # - README.md
+- name: Install Poetry via pipx
   command:
-    cmd: "flask --app {{ project_dir }}/src/simple_powershell_logger/log_server run --host=100.95.68.26 --port 5000"
+    cmd: "pipx install poetry"
   become: no
+  environment:
+    PIPX_HOME: "/home/{{ user }}/.local/pipx"
+    PIPX_BIN_DIR: "/home/{{ user }}/.local/bin"
+
+- name: Configure Poetry to create virtualenv in project
+  command:
+    cmd: "/home/{{ user }}/.local/bin/poetry config virtualenvs.in-project true"
+    chdir: "{{ project_dir }}"
+  become: no
+- name: Remove old cached virtualenv (if it exists)
+  command:
+    cmd: "/home/{{ user }}/.local/bin/poetry env remove --all"
+    chdir: "{{ project_dir }}"
+  become: no
+  ignore_errors: yes # IMPORTANT: This prevents an error if no venv exists
+- name: Explicitly create the in-project virtualenv
+  command:
+    cmd: "/home/{{ user }}/.local/bin/poetry env use python3"
+    chdir: "{{ project_dir }}"
+  become: no
+- name: Install Python dependencies with Poetry
+  command:
+    cmd: "/home/{{ user }}/.local/bin/poetry install --no-root"
+    chdir: "{{ project_dir }}"
+  become: no
+- name: Start basic flask server
+  command:
+    cmd: "/home/{{ user }}/.local/bin/poetry run python flask --app {{ project_dir }}/src/simple_powershell_logger/log_server run --host=100.95.68.26 --port 5000"
+    chdir: "{{ project_dir }}/src/simple_powershell_logger"
+  become: no
+# - name: Start the flask server
+#   command:
+#     cmd: "python3 flask --app {{ project_dir }}/src/simple_powershell_logger/log_server run --host=100.95.68.26 --port 5000"
+#   become: no
 # # Place this AFTER 'Copy C2 server source code'
 # - name: Configure Django settings with dynamic IP
 #   template:
