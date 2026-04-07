@@ -44,8 +44,9 @@ class FileChecking(FileSystemEventHandler):
                     current_content = ps_con_history.readlines()
                     diff = list((Counter(current_content)-Counter(self.content)).elements())
                     self.content = current_content
+                    
+                    command = str(diff)[2:-4].strip()
                     if command:
-                        command = str(diff)[2:-4].strip()
                         json = {"command":command,"hostname":hostname}
                         endpoint = "log"
                         post_log(endpoint, json)
