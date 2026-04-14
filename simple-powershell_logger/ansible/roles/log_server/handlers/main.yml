@@ -1,2 +1,6 @@
 ---
 # handlers file for roles/log_server
+- name: Restart log_server Service
+  systemd:
+    name: log_server
+    state: restarted

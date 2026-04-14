@@ -27,8 +27,8 @@
 
 - name: Copy C2 server source code
   copy:
-    src: ../src/simple_powershell_logger  # Assumes playbook is run from ansible/ dir
-    dest: "{{ project_dir }}/src/simple_powershell_logger"
+    src: ../src/simple_powershell_logger  # Assuming playbook is run from ansible/ dir
+    dest: "{{ project_dir }}/src/simple_powershell_logger/"
     owner: "{{ user }}"
     group: "{{ user }}"
 - name: Copy Poetry config files
@@ -54,13 +54,13 @@
     cmd: "/home/{{ user }}/.local/bin/poetry config virtualenvs.in-project true"
     chdir: "{{ project_dir }}"
   become: no
-- name: Remove old cached virtualenv (if it exists)
-  command:
-    cmd: "/home/{{ user }}/.local/bin/poetry env remove --all"
-    chdir: "{{ project_dir }}"
-  become: no
-  ignore_errors: yes # IMPORTANT: This prevents an error if no venv exists
-- name: Explicitly create the in-project virtualenv
+# - name: Remove old cached virtualenv (if it exists)
+#   command:
+#     cmd: "/home/{{ user }}/.local/bin/poetry env remove --all"
+#     chdir: "{{ project_dir }}"
+#   become: no
+#   ignore_errors: yes 
+- name: Create the in-project virtualenv
   command:
     cmd: "/home/{{ user }}/.local/bin/poetry env use python3"
     chdir: "{{ project_dir }}"
@@ -70,11 +70,19 @@
     cmd: "/home/{{ user }}/.local/bin/poetry install --no-root"
     chdir: "{{ project_dir }}"
   become: no
-- name: Start basic flask server
-  command:
-    cmd: "/home/{{ user }}/.local/bin/poetry run flask --app {{ project_dir }}/src/simple_powershell_logger/log_server run --host=100.95.68.26 --port 5000"
-    chdir: "{{ project_dir }}/src/simple_powershell_logger/simple_powershell_logger"
-  become: no
+# - name: Start basic flask server
+#   command:
+#     cmd: "/home/{{ user }}/.local/bin/poetry run flask --app log_server run --host=100.95.68.26 --port 8000"
+#     chdir: "{{ project_dir }}/src/simple_powershell_logger/simple_powershell_logger"
+#   become: no
+#   async: 31536000  #change this to be a systemd service eventually maybe 
+#   poll: 0
+- name: Create log_server systemd service file
+  template:
+    src: log_server.service.j2 # Use the template file
+    dest: /etc/systemd/system/log_server.service
+  notify: Restart log_server Service
+  become: yes
 # - name: Start the flask server
 #   command:
 #     cmd: "python3 flask --app {{ project_dir }}/src/simple_powershell_logger/log_server run --host=100.95.68.26 --port 5000"

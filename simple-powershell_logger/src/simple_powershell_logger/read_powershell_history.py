@@ -7,10 +7,10 @@ from collections import Counter
 import os
 import time
 import socket
-#todo: add 
-# 
+# add 
+# certin powershell history settings 
 #  to the powershell profile, probably with ansible
-URL = "http://100.105.239.51:5000"
+URL = "http://100.95.68.26:5000"
 hostname = socket.gethostname()
 class FileChecking(FileSystemEventHandler):
     def __init__(self):

@@ -1,0 +1,12 @@
+[Unit]
+Description=log server service
+After=network.target
+
+[Service]
+User={{ user }}
+Group={{ user }}
+WorkingDirectory={{ project_dir }}/src/simple_powershell_logger/simple_powershell_logger
+ExecStart=/home/{{ user }}/.local/bin/poetry run flask --app log_server run --host=100.95.68.26 --port 5000
+
+[Install]
+WantedBy=multi-user.target
