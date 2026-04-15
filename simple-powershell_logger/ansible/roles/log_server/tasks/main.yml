@@ -83,6 +83,13 @@
     dest: /etc/systemd/system/log_server.service
   notify: Restart log_server Service
   become: yes
+
+- name: Ensure log_server Service is enabled and running
+  ansible.builtin.systemd:
+    name: log_server
+    state: started
+    enabled: yes
+  become: yes
 # - name: Start the flask server
 #   command:
 #     cmd: "python3 flask --app {{ project_dir }}/src/simple_powershell_logger/log_server run --host=100.95.68.26 --port 5000"
