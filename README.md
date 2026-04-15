@@ -20,11 +20,11 @@ The server (log_server.py) is a basic flask server that
 * send the data to a discord server (right now its a test server) using a discord webhook
 * It is meant to retry opon getting rate limited
 
-The deployment for the server goes something like:
+The deployment for the server (with the log_server ansible playbook) goes something like:
 * initalize the enviroment (system packages and python packages with poetry) along with the files
 * Then starting a flask service
 
-The deployment on the windows client goes like:
+The deployment on the windows client (with the deploy_py_logger ansible playbook) goes like:
 * Installing pyton on the machine
 * copying the file and executing the file (using async and poll for now)
 
