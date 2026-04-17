@@ -1,11 +1,16 @@
 # simple_powershell_logger
-A simple tool meant to log passwords to powershell
+A simple tool meant to log the Powershell Command history. 
 
 It has parts for the server and logger(client) and for the deployment
 
 The client and server, located in simple-powershell_logger\src\simple_powershell_logger are python scripts meant to be running on the client and server. 
 
-The client read_powershell_history.py:
+Dependiencies: Python 3.12+, Poetry, and the Python libraries of flask, watchdog, requests, and discord-webhook
+
+Hardcoded elements: the server IP and discord webhook url
+Note: PSReadline needs to be active and configured for this tool to work
+
+The client from read_powershell_history.py:
 * It starts a observer with FileChecking derived from the FileSystemEventHandler class, 
 * The FileChecking class finds the directory of the logfile on inititalization
 * On modification to the logfile the script finds different line(s) in the current log file from the stored log file
