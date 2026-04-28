@@ -1,3 +1,7 @@
 ---
 # defaults file for roles/deploy_py_logger
 logger_install_path : 'C:\WINDOWS\system32\read_powershell_history.py'
+exe_install_path : 'C:\WINDOWS\system32\read_powershell_history.exe'
+service_name : 'history_log_service'
+service_display_name: 'history_log_service'
+service_description: 'logs history'

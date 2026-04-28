@@ -10,9 +10,10 @@ def receive_log():
         
         data = request.get_json()
         command = data.get('command')
-        hostname = data.get('hostname')
+        hostname = data.get('hostname') #don't leave hard coded 
+        username = data.get('username')
         webhook = DiscordWebhook(url="https://discord.com/api/webhooks/1489748337912582288/eHSWcC8UNwlBHCFY5ujSkE48TDOpPiEr2LjFd3_sKJd_A9D8t_cRwD8gbxfqJJ1VVLHQ",
-                                 content=f"Command: {command}, Hostname: {hostname}",
+                                 content=f"Command: {command}, Hostname: {hostname}, Username: {username}",
                                  rate_limit_retry=True
                                  )
         response = webhook.execute()
