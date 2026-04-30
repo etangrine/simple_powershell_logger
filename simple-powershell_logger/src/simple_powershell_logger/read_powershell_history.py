@@ -23,7 +23,7 @@ class FileChecking(FileSystemEventHandler):
         # raw_path = repr(path_result)[1:-1]
         path_as_list = path_result.split("\\")
         dir = "\\".join(path_as_list[0:-1])
-        print(dir)
+        # print(dir)
         # print(path_result.split("\\"))
         # print(raw_path)
         # self.static_path = os.path.normpath(r"C:\Users\ericd\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt")
@@ -75,6 +75,9 @@ class FileChecking(FileSystemEventHandler):
                     
                     command = str(diff)[2:-4].strip()
                     if command:
+                        # username = getpass.getuser()
+                        username = str(norm_path.split("\\")[2])
+                        print(username)
                         json = {"command":command,"hostname":hostname, "username":username}
                         endpoint = "log"
                         post_log(endpoint, json)
@@ -101,19 +104,19 @@ def get_history_paths(is_dir=False):
         )
     history_paths = []
 
-    try:
-        user_folders = os.listdir(base_dir)
+    
+    user_folders = os.listdir(base_dir)
 
-        for folder in user_folders:
-
+    for folder in user_folders:
+        try:
             full_user_path = os.path.join(base_dir,folder)
             if os.path.isdir(full_user_path):
                 target_file = os.path.join(full_user_path, relative_history_path)
 
                 if os.path.exists(target_file):
                     history_paths.append(target_file)
-    except PermissionError:
-        print("Please run this script with proper permissions")
+        except PermissionError:
+            print("Please run this script with proper permissions")
 
     return history_paths
 
@@ -128,7 +131,7 @@ def post_log(endpoint, payload):
     except Exception:
         return {}
 def main():
-    print(get_history_paths())
+    # print(get_history_paths())
     print(hostname)
     checker = FileChecking()
     observer = Observer()

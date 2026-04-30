@@ -1,0 +1,11 @@
+- name: Deploy exe_logger
+  hosts: all
+  gather_facts: false
+
+  # roles: 
+  # - deploy_py_logger
+  tasks:
+    - name: Call the role but use a different task file
+      ansible.builtin.include_role:
+        name: deploy_py_logger
+        tasks_from: onefile.yml  

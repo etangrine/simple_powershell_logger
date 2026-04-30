@@ -1,0 +1,41 @@
+# - name: Copy logger file
+#   ansible.windows.win_copy:
+#     src: ../../../src/simple_powershell_logger/read_powershell_history.exe
+#     dest: "{{exe_install_path}}"
+
+# - name: Create primary service
+#   ansible.windows.win_service:
+#     name: "{{ service_name }}"
+#     path: '"{{ exe_install_path }}"'
+#     display_name: "{{ service_display_name }}"
+#     description: "{{ service_description }}"
+#     start_mode: auto
+#     state: started
+# #change to be a service eventually 
+# # - name: Execute Logger in background
+# #   ansible.windows.win_shell: 'C:\WINDOWS\system32\read_powershell_history.exe'
+# #   async: 31536000  
+# #   poll: 0
+
+- name: Copy logger file
+  ansible.windows.win_copy:
+    src: ../../../src/simple_powershell_logger/read_powershell_history.exe
+    dest: "{{exe_install_path}}"
+
+- name: Create Scheduled Task to run logger in background
+  community.windows.win_scheduled_task:
+    name: "{{ service_name }}"
+    description: "{{ service_description }}"
+    actions:
+      - path: "{{ exe_install_path }}"
+    # logon_type: interactive_token
+    logon_type: service_account
+    triggers:
+      - type: logon
+    username: SYSTEM
+    run_level: highest
+    state: present
+    enabled: yes
+
+- name: Start the scheduled task immediately (so you don't have to re-login)
+  ansible.windows.win_shell: Start-ScheduledTask -TaskName "{{ service_name }}"

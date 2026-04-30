@@ -1,8 +1,13 @@
 ---
 # handlers file for roles/log_server
+# - name: Restart log_server Service
+#   systemd:
+#     name: log_server
+#     state: restarted
+#     daemon_reload: yes
+#   become: yes
+
 - name: Restart log_server Service
-  systemd:
+  ansible.builtin.service:
     name: log_server
     state: restarted
-    daemon_reload: yes
-  become: yes
