@@ -18,7 +18,7 @@ def receive_log():
                                  content=f"Command: {command}, Hostname: {hostname}, Username: {username}",
                                  rate_limit_retry=True
                                  )
-        response = Discord_Webhook.execute()
+        response = webhook.execute()
         print(response)
         print(f"Host {hostname} ran {command}")
         return f"Host {hostname} ran {command}"

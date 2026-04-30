@@ -34,7 +34,7 @@
 - name: Deploy template for server file
   ansible.builtin.template:
     src: log_server.py.j2
-    dest: "{{ project_dir }}/src/simple_powershell_logger/log_server.py"
+    dest: "{{ project_dir }}/src/simple_powershell_logger/simple_powershell_logger/log_server.py"
     owner: "{{ user }}"
     # owner: "{{ user }}"
 - name: Copy Poetry config files

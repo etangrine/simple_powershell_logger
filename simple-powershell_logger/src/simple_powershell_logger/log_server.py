@@ -14,11 +14,11 @@ def receive_log():
         command = data.get('command')
         hostname = data.get('hostname') #don't leave hard coded 
         username = data.get('username')
-        webhook = DiscordWebhook(url="Discord_Webhook",
+        webhook = DiscordWebhook(url=Discord_Webhook,
                                  content=f"Command: {command}, Hostname: {hostname}, Username: {username}",
                                  rate_limit_retry=True
                                  )
-        # response = Discord_Webhook.execute()
+        response = webhook.execute()
         print(response)
         print(f"Host {hostname} ran {command}")
         return f"Host {hostname} ran {command}"
