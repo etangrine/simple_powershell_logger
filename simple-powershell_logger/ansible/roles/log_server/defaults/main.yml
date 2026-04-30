@@ -2,3 +2,4 @@
 # defaults file for roles/log_server
 project_dir : '/opt/log_server'
 user : 'eric'
+webhook : "{{ lookup('ansible.builtin.env', 'Discord_Webhook') }}" 

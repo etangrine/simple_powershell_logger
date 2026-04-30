@@ -18,19 +18,25 @@
 
 - name: Create project directory
   file:
-    path: "{{ project_dir }}"
+    path: "{{ project_dir }}/src/simple_powershell_logger"
     state: directory
     owner: "{{ user }}"
     group: "{{ user }}"
     mode: '0755'
   become: yes
 
-- name: Copy C2 server source code
-  copy:
-    src: ../src/simple_powershell_logger  # Assuming playbook is run from ansible/ dir
-    dest: "{{ project_dir }}/src/simple_powershell_logger/"
+# - name: Copy C2 server source code
+#   copy:
+#     src: ../src/simple_powershell_logger  # Assuming playbook is run from ansible/ dir
+#     dest: "{{ project_dir }}/src/simple_powershell_logger/"
+#     owner: "{{ user }}"
+#     owner: "{{ user }}"
+- name: Deploy template for server file
+  ansible.builtin.template:
+    src: log_server.py.j2
+    dest: "{{ project_dir }}/src/simple_powershell_logger/log_server.py"
     owner: "{{ user }}"
-    group: "{{ user }}"
+    # owner: "{{ user }}"
 - name: Copy Poetry config files
   copy:
     src: ../{{ item }}

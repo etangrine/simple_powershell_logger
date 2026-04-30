@@ -1,6 +1,7 @@
 - name: Deploy log_server
   hosts: all
   gather_facts: false
-
+  # environment:
+  #   Discord_Webhook: "{{ lookup('ansible.builtin.env', 'Discord_Webhook') }}"
   roles: 
   - log_server

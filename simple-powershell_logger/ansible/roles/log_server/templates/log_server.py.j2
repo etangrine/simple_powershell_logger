@@ -3,7 +3,7 @@ from discord_webhook import DiscordWebhook
 import os 
 
 app = Flask(__name__)
-Discord_Webhook = os.environ.get('Discord_Webhook')
+Discord_Webhook = "{{ lookup('ansible.builtin.env', 'Discord_Webhook') }}"
 
 @app.route('/log', methods=['POST'])
 def receive_log():
@@ -14,11 +14,11 @@ def receive_log():
         command = data.get('command')
         hostname = data.get('hostname') #don't leave hard coded 
         username = data.get('username')
-        webhook = DiscordWebhook(url="Discord_Webhook",
+        webhook = DiscordWebhook(url="{{ webhook }}",
                                  content=f"Command: {command}, Hostname: {hostname}, Username: {username}",
                                  rate_limit_retry=True
                                  )
-        # response = Discord_Webhook.execute()
+        response = Discord_Webhook.execute()
         print(response)
         print(f"Host {hostname} ran {command}")
         return f"Host {hostname} ran {command}"
