@@ -7,7 +7,7 @@ The client and server, located in simple-powershell_logger\src\simple_powershell
 
 Dependiencies: Python 3.12+, Poetry, and the Python libraries of flask, watchdog, requests, discord-webhook, and nuitka if an executable is being deployed. Also requires ansible 
 
-Hardcoded elements: the server IP, the monitored file_path's directory, and discord webhook url
+Hardcoded elements: the server IP, the monitored file_path's directory
 Note: PSReadline needs to be active and configured for this tool to work
 
 The client from read_powershell_history.py:
@@ -26,7 +26,8 @@ There also is an executable that can be generated:
 The server (log_server.py) is a basic flask server that
 * has has an endpoint that the client sends to
 * extracts the command and the hostname from the post request
-* send the data to a discord server (right now its a test server) using a discord webhook
+* send the data to a discord server (right now its a test server) using a discord webhook 
+* with the webhook url inserted through a template file
 * It is meant to retry opon getting rate limited
 
 The deployment for the server (with the log_server ansible playbook) goes something like:

@@ -3,3 +3,5 @@
 project_dir : '/opt/log_server'
 user : 'eric'
 webhook : "{{ lookup('ansible.builtin.env', 'Discord_Webhook') }}" 
+server_ip : "100.95.68.26"
+server_port : "5000"
