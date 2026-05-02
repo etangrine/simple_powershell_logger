@@ -92,7 +92,10 @@ def get_history_paths(is_dir=False):
     # output = subprocess.check_output(cmd, shell=True).decode().splitlines()
     # print(output) 
     #could try to get the paths a bit more dynamically
-    base_dir = r"C:\Users"
+    # base_dir = r"C:\Users"
+    base_dir = os.environ.get("SystemDrive") + r"\Users"
+    print(base_dir)
+    # could dynamically generate this
     relative_history_path = os.path.join(
             "AppData", "Roaming", "Microsoft", "Windows", 
             "PowerShell", "PSReadLine", "ConsoleHost_history.txt"

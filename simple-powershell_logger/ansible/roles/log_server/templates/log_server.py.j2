@@ -18,7 +18,10 @@ def receive_log():
                                  content=f"Command: {command}, Hostname: {hostname}, Username: {username}",
                                  rate_limit_retry=True
                                  )
-        response = webhook.execute()
+        try:
+            response = webhook.execute()
+        except Exception as e:
+            print(f"Exception {e}")
         print(response)
         print(f"Host {hostname} ran {command}")
         return f"Host {hostname} ran {command}"

@@ -5,10 +5,10 @@
 
 # - name: Create primary service
 #   ansible.windows.win_service:
-#     name: "{{ service_name }}"
+#     name: "{{ task_name }}"
 #     path: '"{{ exe_install_path }}"'
 #     display_name: "{{ service_display_name }}"
-#     description: "{{ service_description }}"
+#     description: "{{ task_description }}"
 #     start_mode: auto
 #     state: started
 # #change to be a service eventually 
@@ -24,8 +24,8 @@
 
 - name: Create Scheduled Task to run logger in background
   community.windows.win_scheduled_task:
-    name: "{{ service_name }}"
-    description: "{{ service_description }}"
+    name: "{{ task_name }}"
+    description: "{{ task_description }}"
     actions:
       - path: "{{ exe_install_path }}"
     # logon_type: interactive_token
@@ -37,5 +37,5 @@
     state: present
     enabled: yes
 
-- name: Start the scheduled task immediately (so you don't have to re-login)
-  ansible.windows.win_shell: Start-ScheduledTask -TaskName "{{ service_name }}"
+- name: Start the scheduled task
+  ansible.windows.win_shell: Start-ScheduledTask -TaskName "{{ task_name }}"
