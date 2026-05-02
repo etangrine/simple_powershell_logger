@@ -3,7 +3,7 @@ A simple tool meant to log the Powershell Command history.
 
 It has parts for the server and logger(client) and for the deployment
 
-The client and server, located in simple-powershell_logger\src\simple_powershell_logger are python scripts meant to be running on the client and server. 
+The client and server, located in simple-powershell_logger\src\simple_powershell_logger, are python scripts meant to be running on the client and server. 
 
 Dependiencies: Python 3.12+, Poetry, and the Python libraries of flask, watchdog, requests, discord-webhook, and nuitka if an executable is being deployed. Also requires ansible 
 
@@ -41,4 +41,4 @@ The deployment on the windows client (with the deploy_py_logger ansible playbook
 To deploy the executable:
 * Generate the executable 
 * run the playbook deploy_exe_logger.yml instead of deploy_py_logger.yml
-
+The executable is deployed with a scheduled task 
