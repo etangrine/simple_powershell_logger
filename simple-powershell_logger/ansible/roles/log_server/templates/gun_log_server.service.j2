@@ -1,0 +1,15 @@
+[Unit]
+Description=Log Server Gunicorn Daemon
+After=network.target
+
+[Service]
+User={{ user }}
+Group={{ user }}
+WorkingDirectory={{ project_dir }}/src/simple_powershell_logger/simple_powershell_logger
+ExecStart=/home/{{ user }}/.local/bin/poetry run gunicorn \
+    --workers 3 \
+    --bind 127.0.0.1:8001 \
+    log_server.app
+
+[Install]
+WantedBy=multi-user.target

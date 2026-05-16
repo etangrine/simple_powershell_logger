@@ -13,3 +13,9 @@
     state: restarted
     daemon_reload: yes
   become: yes
+
+- name: Restart Nginx
+  ansible.builtin.service:
+    name: nginx
+    state: restarted
+  become: yes

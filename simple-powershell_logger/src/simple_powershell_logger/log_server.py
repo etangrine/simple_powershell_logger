@@ -11,6 +11,11 @@ def receive_log():
     if request.is_json:
         
         data = request.get_json()
+        # encrypted_data = data.get("d")
+        # if not encrypted_data:
+        #     print("No data")
+        # decrypted_data = dec
+
         command = data.get('command')
         hostname = data.get('hostname') #don't leave hard coded 
         username = data.get('username')
@@ -24,5 +29,5 @@ def receive_log():
             print(f"Exception {e}")
         print(response)
         print(f"Host {hostname} ran {command}")
-        return f"Host {hostname} ran {command}"
+        return ""
         #Incorporate discord webhook

