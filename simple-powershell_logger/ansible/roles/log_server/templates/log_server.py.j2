@@ -11,8 +11,6 @@ PSK = "0feNcM1h9Cx2mWAopX6Rq8WZ9sHUvQG4TthfgCL2lk0="
 
 
 
-
-
 app = Flask(__name__)
 Discord_Webhook = "{{ lookup('ansible.builtin.env', 'Discord_Webhook') }}"
 
@@ -50,7 +48,6 @@ def _get_key() -> bytes:
     return base64.b64decode(PSK)
 
 def decrypt_payload(encrypted_b64: str) -> dict:
-
     raw = base64.b64decode(encrypted_b64)
     iv = raw[:16]
     ciphertext = raw[16:]
@@ -62,11 +59,4 @@ def decrypt_payload(encrypted_b64: str) -> dict:
     unpadder = padding.PKCS7(128).unpadder()
     plaintext = unpadder.update(padded) + unpadder.finalize()
 
-    inner = json.loads(plaintext.decode("utf-8"))
-
-    result = {}
-    for short_name, value in inner.items():
-        real_name = FIELD_MAP.get(short_name, short_name)
-        result[real_name] = value
-
-    return result
+    return json.loads(plaintext.decode("utf-8"))
