@@ -3,13 +3,51 @@ from discord_webhook import DiscordWebhook
 import os 
 import base64
 import json
+import threading
+import queue
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.backends import default_backend
 
 PSK = "0feNcM1h9Cx2mWAopX6Rq8WZ9sHUvQG4TthfgCL2lk0="
 
+log_queue = queue.Queue()
 
+def discord_batch_worker():
+
+    batch_msg = ""
+    while True:
+        try:
+            log_data = log_queue.get(timeout=3.0)
+
+            formatted_line = f"**{log_data['hostname']}** (`{log_data['username']}`): ```powershell\n{log_data['command']}\n```\n"
+
+            if len(batch_msg) + len(formatted_line) > 1800:
+                    send_to_discord(batch_msg)
+                    batch_msg = formatted_line 
+            else:
+                batch_msg += formatted_line
+                    
+            log_queue.task_done()
+
+        except queue.Empty:
+
+            if batch_msg:
+                send_to_discord(batch_msg)
+                batch_msg = ""
+
+def send_to_discord(content):
+    webhook = DiscordWebhook(
+        url="{{ webhook }}",
+        content=content,
+        rate_limit_retry=True
+    )
+    try:
+        webhook.execute()
+    except Exception as e:
+        print(f"Exception sending webhook: {e}")
+
+threading.Thread(target=discord_batch_worker, daemon=True).start()
 
 app = Flask(__name__)
 Discord_Webhook = "{{ lookup('ansible.builtin.env', 'Discord_Webhook') }}"
@@ -24,23 +62,38 @@ def receive_log():
         encrypted_data = base_data.get("d")
         if not encrypted_data:
             print("No data")
-        data = decrypt_payload(encrypted_data)
-        command = data.get('command')
-        hostname = data.get('hostname') #don't leave hard coded 
-        username = data.get('username')
+            return "No data", 400
 
-
-        webhook = DiscordWebhook(url="{{ webhook }}",
-                                 content=f"Command: {command}, Hostname: {hostname}, Username: {username}",
-                                 rate_limit_retry=True
-                                 )
         try:
-            response = webhook.execute()
+            data = decrypt_payload(encrypted_data)
         except Exception as e:
-            print(f"Exception {e}")
-        print(response)
-        print(f"Host {hostname} ran {command}")
-        return f""
+            print(f"Decryption failed: {e}")
+            return "Decryption failed", 400        
+        
+        command = data.get('command')
+        hostname = data.get('hostname', 'unknown') #don't leave hard coded 
+        username = data.get('username', 'unknown')
+
+        log_queue.put({
+            "command": command,
+            "hostname": hostname,
+            "username": username
+        })
+        
+        print(f"Queued log from {hostname} - {username}")
+        return "", 200
+
+        # webhook = DiscordWebhook(url="{{ webhook }}",
+        #                          content=f"Command: {command}, Hostname: {hostname}, Username: {username}",
+        #                          rate_limit_retry=True
+        #                          )
+        # try:
+        #     response = webhook.execute()
+        # except Exception as e:
+        #     print(f"Exception {e}")
+        # print(response)
+        # print(f"Host {hostname} ran {command}")
+        # return f""
         # return
         #Incorporate discord webhook
 

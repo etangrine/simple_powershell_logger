@@ -115,7 +115,7 @@ class FileChecking(FileSystemEventHandler):
                         # command = "\n".join(cleaned_commands)
                         # for command in diff:
                         if diff:#doesn't do that much after testing
-                            batched_cmds = "\n".join(diff)
+                            batched_cmds = ", ".join(diff)
 
                             username = str(norm_path.split("\\")[2])
                             # print(f"Command from {username}: {command}")
@@ -123,7 +123,6 @@ class FileChecking(FileSystemEventHandler):
                             endpoint = "log"
                             post_log(endpoint, json_payload)
                 elif current_size < prev_pos:
-                    # Handle Edge Case: If the history file is cleared, reset tracking to 0
                     print(f"[*] History file truncated or cleared for {norm_path}. Resetting position.")
                     self.file_positions[norm_path] = current_size
             except PermissionError: 
