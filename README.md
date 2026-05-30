@@ -36,7 +36,7 @@ The server (log_server.py) is a server which uses gunicorn and nginx that
 The deployment for the server (with the log_server ansible playbook and uses a .j2 template) goes something like:
 * configure the ssh key pair and ip of the server in the inventory file
 * initalize the enviroment (system packages and python packages with poetry) along with the files (most of the used ones are from templates)
-* Then starting or restarting a flask service
+* Then starting or restarting the service for the server
 
 The deployment on the windows client (with the deploy_py_logger ansible playbook) goes like:
 * configure credentials and ips on the inventory file
@@ -47,3 +47,6 @@ To deploy the executable:
 * Generate the executable 
 * run the playbook deploy_exe_logger.yml instead of deploy_py_logger.yml
 The executable is deployed with a scheduled task 
+
+
+
