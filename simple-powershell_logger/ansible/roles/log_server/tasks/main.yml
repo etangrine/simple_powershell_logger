@@ -39,6 +39,20 @@
     owner: "{{ user }}"
   notify: Restart log_server Service
     # owner: "{{ user }}"
+- name: Deploy template for discord worker
+  ansible.builtin.template:
+    src: discord_worker.py.j2
+    dest: "{{ project_dir }}/src/simple_powershell_logger/simple_powershell_logger/discord_worker.py"
+    owner: "{{ user }}"
+  notify: Restart log_server Service
+
+- name: Copy server utils
+  ansible.builtin.copy:
+    src: ../../../src/simple_powershell_logger/server_utils.py
+    dest: "{{ project_dir }}/src/simple_powershell_logger/simple_powershell_logger/server_utils.py"
+    owner: "{{ user }}"
+  notify: Restart log_server Service
+
 - name: Copy Poetry config files
   copy:
     src: ../{{ item }}
