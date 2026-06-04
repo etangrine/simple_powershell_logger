@@ -36,11 +36,13 @@ def receive_log():
             return "Decryption failed", 400        
         
         command = data.get('command')
+        ip = data.get('ip')
         hostname = data.get('hostname', 'unknown') #don't leave hard coded 
         username = data.get('username', 'unknown')
 
         log_queue.put({
             "command": command,
+            "ip": ip,
             "hostname": hostname,
             "username": username
         })

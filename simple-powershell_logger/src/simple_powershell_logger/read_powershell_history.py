@@ -18,6 +18,7 @@ from client_utils import encrypt_payload
 #  to the powershell profile, probably with ansible
 URL = "http://100.95.68.26:5000"
 hostname = socket.gethostname()
+ip = socket.gethostbyname(hostname)
 username = getpass.getuser()
 #example PSK
 PSK = "0feNcM1h9Cx2mWAopX6Rq8WZ9sHUvQG4TthfgCL2lk0="
@@ -82,7 +83,7 @@ class FileChecking(FileSystemEventHandler):
 
                             username = str(norm_path.split("\\")[2])
                             # print(f"Command from {username}: {command}")
-                            json_payload = {"command": batched_cmds, "hostname": hostname, "username": username}
+                            json_payload = {"command": batched_cmds,"ip":ip, "hostname": hostname, "username": username}
                             endpoint = "log"
                             post_log(endpoint, json_payload)
                 elif current_size < prev_pos:
