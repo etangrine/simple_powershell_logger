@@ -25,7 +25,7 @@ PSK = "0feNcM1h9Cx2mWAopX6Rq8WZ9sHUvQG4TthfgCL2lk0="
 # other_logger_paths = ""
 
 class FileChecking(FileSystemEventHandler):
-    def __init__(self):
+    def __init__(self):# think about having a check for new history files 
         # print("init")
         super()
         
@@ -61,6 +61,7 @@ class FileChecking(FileSystemEventHandler):
         
         print(norm_path)
         # if norm_path == self.static_path:
+        # could check if path is expected to be a history file?
         if norm_path in self.history_paths:
             time.sleep(0.1)
             try:

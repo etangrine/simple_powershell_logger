@@ -43,8 +43,10 @@ The deployment on the windows client (with the deploy_py_logger ansible playbook
 * Installing pyton on the machine
 * copying the file and executing the file (using async and poll for now)
 
+### Note that the deploy_py_logger no longer works because the functionality is in multiple files
+
 To deploy the executable:
-* Generate the executable 
+* Generate the executable with for example nuitka (example:python -m poetry run python -m nuitka --onefile --windows-console-mode=disable  read_powershell_history.py)
 * run the playbook deploy_exe_logger.yml instead of deploy_py_logger.yml
 The executable is deployed with a scheduled task 
 
