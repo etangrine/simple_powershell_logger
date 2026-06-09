@@ -15,7 +15,7 @@ The client from read_powershell_history.py:
 * The FileChecking class finds the directories of the logfiles for the different users on inititalization
 * On modification to the logfile the script finds new data after the current stream position
 * It then updates the current stream position to the end of the file
-* It then encrypts the payload with a PSK sends a post request to the server with the command and the hostname
+* It then encrypts the payload with a PSK sends a post request to the server with the command and the hostname, user, and ip address
 
 The observer then starts and then the program loops.
 
