@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Nuitka build output
+*.dist/
+*.build/
+*.onefile-build/
+
+# Built executables
+*.exe
+
+# IDA Pro / reverse engineering artifacts
+*.id0
+*.id1
+*.id2
+*.nam
+*.til
+*.i64
+*.idb
+
+# Poetry / pip
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Flask / SQLite local data
+instance/
+*.sqlite
+*.sqlite3
+*.db
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+*.log
+
+# Unused experimental subprojects
+simple-powershell_logger/src/go/
